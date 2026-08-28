@@ -21,6 +21,8 @@ export interface Chunk {
   pageEnd: number;
   content: string;
   tokenCount: number;
+  charStart: number;
+  charEnd: number;
 }
 
 /** A chunk plus its stored embedding, as held by a vector store. */
