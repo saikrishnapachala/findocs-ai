@@ -27,6 +27,7 @@ export interface Chunk {
 
 /** A chunk plus its stored embedding, as held by a vector store. */
 export interface StoredChunk extends Chunk {
+  sessionId: string;
   embedding: number[];
   documentName: string;
 }
