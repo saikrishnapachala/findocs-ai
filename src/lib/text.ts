@@ -23,14 +23,18 @@ export function keywords(text: string): string[] {
 }
 
 /**
- * Split text into sentences. Deliberately simple: split on sentence-ending
- * punctuation followed by whitespace, keeping the terminator. Good enough for
- * chunk-boundary snapping and extractive answers; not a full NLP sentence
- * segmenter (documented limitation).
+ * Split text into sentences.
+ *
+ * Splits at whitespace that follows a sentence terminator (.!?) and precedes a
+ * new-sentence starter (capital letter, digit, or opening quote/paren). Using
+ * `split` — not `match` — guarantees no characters are ever dropped, and the
+ * boundary conditions avoid breaking on decimals ("$1,250.4"), abbreviations
+ * ("U.S. dollar"), and mid-number periods. This is a heuristic, not a full NLP
+ * segmenter (documented limitation), but it is loss-free.
  */
 export function splitSentences(text: string): string[] {
   const normalized = text.replace(/\s+/g, ' ').trim();
   if (!normalized) return [];
-  const parts = normalized.match(/[^.!?]+[.!?]+(\s|$)|[^.!?]+$/g);
-  return (parts ?? [normalized]).map((s) => s.trim()).filter(Boolean);
+  const parts = normalized.split(/(?<=[.!?])\s+(?=["'(\[]?[A-Z0-9])/);
+  return parts.map((s) => s.trim()).filter(Boolean);
 }

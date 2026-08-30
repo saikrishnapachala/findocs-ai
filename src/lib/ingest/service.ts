@@ -5,7 +5,7 @@ import { getRegistry } from '@/lib/store/registry';
 import { addSpend } from '@/lib/spend';
 import { AppError } from '@/lib/errors';
 import { createLogger, type Logger } from '@/lib/logger';
-import type { StoredChunk } from '@/lib/types';
+import type { PageText, StoredChunk } from '@/lib/types';
 import { extractPdf } from './pdf';
 import { chunkPages } from './chunker';
 
@@ -26,8 +26,6 @@ export async function ingestDocument(input: {
 }): Promise<void> {
   const cfg = getConfig();
   const registry = getRegistry();
-  const store = getVectorStore();
-  const provider = getProvider();
   const log = input.log ?? createLogger();
   const { sessionId, documentId, filename } = input;
 
@@ -48,50 +46,70 @@ export async function ingestDocument(input: {
       );
     }
 
-    update({ status: 'chunking' });
-    const chunks = chunkPages(documentId, pages, {
-      targetTokens: cfg.chunkTokens,
-      overlapRatio: cfg.chunkOverlap,
-    });
-    update({ chunksTotal: chunks.length, chunksDone: 0 });
-    if (chunks.length === 0) {
-      throw new AppError('empty_document', 'No text could be extracted.', 422);
-    }
-
-    update({ status: 'embedding' });
-    const stored: StoredChunk[] = [];
-    for (let i = 0; i < chunks.length; i += EMBED_BATCH) {
-      const batch = chunks.slice(i, i + EMBED_BATCH);
-      const { vectors, usage } = await withRetry(
-        () => provider.embed(batch.map((c) => c.content)),
-        log,
-      );
-      addSpend(usage.costUsd);
-      batch.forEach((chunk, j) => {
-        stored.push({
-          ...chunk,
-          sessionId,
-          documentName: filename,
-          embedding: vectors[j] ?? [],
-        });
-      });
-      update({ chunksDone: stored.length });
-    }
-
-    await store.addChunks(stored);
-    update({ status: 'ready', chunksDone: stored.length });
-    log.info('ingest.ready', {
-      documentId,
-      pageCount,
-      chunks: stored.length,
-      provider: provider.name,
-    });
+    await ingestPages({ sessionId, documentId, filename, pages, log });
+    log.info('ingest.ready', { documentId, pageCount });
   } catch (e) {
     const message =
       e instanceof AppError ? e.message : 'Ingestion failed unexpectedly.';
     update({ status: 'failed', error: message });
     log.error('ingest.failed', { documentId, error: message });
   }
+}
+
+/**
+ * Chunk -> batch-embed -> store a set of already-extracted pages, updating the
+ * document's status/progress. Shared by PDF ingestion and the sample seeder
+ * (which starts from text, not a PDF). Throws on failure; callers own status.
+ */
+export async function ingestPages(input: {
+  sessionId: string;
+  documentId: string;
+  filename: string;
+  pages: PageText[];
+  log?: Logger;
+}): Promise<void> {
+  const cfg = getConfig();
+  const registry = getRegistry();
+  const store = getVectorStore();
+  const provider = getProvider();
+  const log = input.log ?? createLogger();
+  const { sessionId, documentId, filename, pages } = input;
+
+  const update = (patch: Parameters<typeof registry.updateDocument>[2]) =>
+    registry.updateDocument(sessionId, documentId, patch);
+
+  update({ status: 'chunking' });
+  const chunks = chunkPages(documentId, pages, {
+    targetTokens: cfg.chunkTokens,
+    overlapRatio: cfg.chunkOverlap,
+  });
+  update({ chunksTotal: chunks.length, chunksDone: 0 });
+  if (chunks.length === 0) {
+    throw new AppError('empty_document', 'No text could be extracted.', 422);
+  }
+
+  update({ status: 'embedding' });
+  const stored: StoredChunk[] = [];
+  for (let i = 0; i < chunks.length; i += EMBED_BATCH) {
+    const batch = chunks.slice(i, i + EMBED_BATCH);
+    const { vectors, usage } = await withRetry(
+      () => provider.embed(batch.map((c) => c.content)),
+      log,
+    );
+    addSpend(usage.costUsd);
+    batch.forEach((chunk, j) => {
+      stored.push({
+        ...chunk,
+        sessionId,
+        documentName: filename,
+        embedding: vectors[j] ?? [],
+      });
+    });
+    update({ chunksDone: stored.length });
+  }
+
+  await store.addChunks(stored);
+  update({ status: 'ready', chunksDone: stored.length });
 }
 
 /** Retry with exponential backoff on transient errors (429/5xx). */
