@@ -44,6 +44,7 @@ export function postProcessAnswer(
         documentName: chunk.documentName,
         pageStart: chunk.pageStart,
         pageEnd: chunk.pageEnd,
+        content: chunk.content,
       };
     });
 

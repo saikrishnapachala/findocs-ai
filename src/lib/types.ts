@@ -52,6 +52,8 @@ export interface Citation {
   documentName: string;
   pageStart: number;
   pageEnd: number;
+  /** The passage text this citation points to (for the source side-panel). */
+  content?: string;
 }
 
 export interface Usage {
