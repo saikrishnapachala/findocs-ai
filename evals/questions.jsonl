@@ -1,0 +1,38 @@
+{"id":"nw-revenue","doc":"northwind","page":1,"question":"What was total revenue in fiscal year 2024?","expected_answer":"$1,250.4 million"}
+{"id":"nw-revenue-growth","doc":"northwind","page":1,"question":"By what percentage did total revenue grow in fiscal 2024?","expected_answer":"12.3%"}
+{"id":"nw-net-income","doc":"northwind","page":1,"question":"What was net income for fiscal year 2024?","expected_answer":"$184.2 million"}
+{"id":"nw-eps","doc":"northwind","page":1,"question":"What were diluted earnings per share in fiscal 2024?","expected_answer":"$3.41"}
+{"id":"nw-gross-margin","doc":"northwind","page":1,"question":"What was the gross margin in fiscal 2024?","expected_answer":"41.5%"}
+{"id":"nw-cash","doc":"northwind","page":1,"question":"How much cash and cash equivalents did the company have at year end?","expected_answer":"$612.9 million"}
+{"id":"nw-debt","doc":"northwind","page":1,"question":"What was total debt at the end of fiscal 2024?","expected_answer":"$300.0 million"}
+{"id":"nw-employees","doc":"northwind","page":1,"question":"Approximately how many people did the company employ?","expected_answer":"6,400"}
+{"id":"nw-hardware-rev","doc":"northwind","page":2,"question":"What was Automation Hardware segment revenue?","expected_answer":"$742.7 million"}
+{"id":"nw-cloud-growth","doc":"northwind","page":2,"question":"How fast did Cloud Software revenue grow year over year?","expected_answer":"28.1%"}
+{"id":"nw-nrr","doc":"northwind","page":2,"question":"What was net revenue retention in the Cloud Software segment?","expected_answer":"118%"}
+{"id":"nw-backlog","doc":"northwind","page":2,"question":"What was backlog at fiscal year end?","expected_answer":"$486.0 million"}
+{"id":"nw-risks","doc":"northwind","page":3,"question":"What are the principal risk factors?"}
+{"id":"nw-fx","doc":"northwind","page":3,"question":"What share of revenue is generated outside the United States?","expected_answer":"46%"}
+{"id":"nw-concentration","doc":"northwind","page":3,"question":"What percentage of revenue came from the ten largest customers?","expected_answer":"31%"}
+{"id":"nw-dividend","doc":"northwind","page":4,"question":"What was the quarterly dividend per share?","expected_answer":"$0.30"}
+{"id":"nw-dividend-total","doc":"northwind","page":4,"question":"What was the total dividend per share for the year?","expected_answer":"$1.20"}
+{"id":"nw-buyback","doc":"northwind","page":4,"question":"How much common stock did the company repurchase?","expected_answer":"$120.0 million"}
+{"id":"nw-rd","doc":"northwind","page":4,"question":"How much did the company spend on research and development?","expected_answer":"$138.5 million"}
+{"id":"nw-capex","doc":"northwind","page":4,"question":"What were capital expenditures in fiscal 2024?","expected_answer":"$58.3 million"}
+{"id":"nw-outlook","doc":"northwind","page":5,"question":"What revenue growth does management expect for fiscal 2025?","expected_answer":"8% to 11%"}
+{"id":"nw-revolver","doc":"northwind","page":5,"question":"How large is the revolving credit facility?","expected_answer":"$500.0 million"}
+{"id":"eg-deductible-ind","doc":"evergreen","page":1,"question":"What is the in-network deductible for an individual?","expected_answer":"$1,500"}
+{"id":"eg-deductible-fam","doc":"evergreen","page":1,"question":"What is the in-network deductible for a family?","expected_answer":"$3,000"}
+{"id":"eg-deductible-oon","doc":"evergreen","page":1,"question":"What is the out-of-network deductible for an individual?","expected_answer":"$3,000"}
+{"id":"eg-coinsurance","doc":"evergreen","page":2,"question":"What is the in-network coinsurance rate?","expected_answer":"20%"}
+{"id":"eg-oop","doc":"evergreen","page":2,"question":"What is the individual out-of-pocket maximum for in-network care?","expected_answer":"$6,000"}
+{"id":"eg-pcp","doc":"evergreen","page":3,"question":"What is the copay to see a primary care physician?","expected_answer":"$25"}
+{"id":"eg-specialist","doc":"evergreen","page":3,"question":"What is the specialist copay?","expected_answer":"$50"}
+{"id":"eg-telehealth","doc":"evergreen","page":3,"question":"What is the telehealth copay?","expected_answer":"$15"}
+{"id":"eg-tier1","doc":"evergreen","page":4,"question":"What is the copay for Tier 1 generic drugs?","expected_answer":"$10"}
+{"id":"eg-er","doc":"evergreen","page":5,"question":"What is the emergency room copay?","expected_answer":"$300"}
+{"id":"eg-appeal","doc":"evergreen","page":5,"question":"How long do I have to appeal a denied claim?","expected_answer":"180 days"}
+{"id":"un-ceo-salary","doc":"northwind","unanswerable":true,"question":"What is the CEO's annual salary?"}
+{"id":"un-ticker","doc":"northwind","unanswerable":true,"question":"What is the company's stock ticker symbol?"}
+{"id":"un-dental-max","doc":"evergreen","unanswerable":true,"question":"What is the annual maximum for adult dental coverage?"}
+{"id":"un-board-size","doc":"northwind","unanswerable":true,"question":"How many members sit on the board of directors?"}
+{"id":"un-vision","doc":"evergreen","unanswerable":true,"question":"What is the copay for a routine vision exam?"}

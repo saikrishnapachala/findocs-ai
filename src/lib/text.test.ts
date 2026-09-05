@@ -35,4 +35,9 @@ describe('keywords', () => {
   it('keeps numeric tokens', () => {
     expect(tokenizeWords('2024 revenue')).toContain('2024');
   });
+  it('strips trailing punctuation so end-of-sentence terms match (regression)', () => {
+    // "copay." must tokenize to "copay", or keyword/BM25 matching misses it.
+    expect(tokenizeWords('have a $15 copay.')).toContain('copay');
+    expect(tokenizeWords('the U.S. market')).toContain('u.s');
+  });
 });

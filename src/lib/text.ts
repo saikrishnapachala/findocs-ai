@@ -10,11 +10,16 @@ const STOPWORDS = new Set([
   'will', 'would', 'should', 'could', 'may', 'might', 'about',
 ]);
 
-/** Lowercased alphanumeric word tokens (keeps digits, useful for figures). */
+/**
+ * Lowercased alphanumeric word tokens (keeps digits, useful for figures).
+ * Internal separators are kept ("u.s", "3.41", "cloud-based") but trailing
+ * punctuation is not, so "copay." tokenizes to "copay" — otherwise keyword and
+ * BM25 matching silently miss end-of-sentence terms.
+ */
 export function tokenizeWords(text: string): string[] {
-  return (text.toLowerCase().match(/[a-z0-9][a-z0-9._-]*/g) ?? []).filter(
-    (w) => w.length > 1,
-  );
+  return (
+    text.toLowerCase().match(/[a-z0-9]+(?:[._-][a-z0-9]+)*/g) ?? []
+  ).filter((w) => w.length > 1);
 }
 
 /** Content words for keyword overlap: tokens minus stopwords. */

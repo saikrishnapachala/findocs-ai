@@ -80,23 +80,30 @@ function buildExtractiveAnswer(params: GenerateParams): string {
     return 'Please ask a question about the uploaded documents.';
   }
 
-  type Scored = { sentence: string; score: number; citation: number };
+  type Scored = { sentence: string; score: number; citation: number; distinct: number };
   const scored: Scored[] = [];
   params.context.forEach((chunk, i) => {
     for (const sentence of splitSentences(chunk.content)) {
       const sKeys = keywords(sentence);
       if (sKeys.length === 0) continue;
-      let hits = 0;
-      for (const k of sKeys) if (qKeys.has(k)) hits++;
-      const score = hits / Math.sqrt(sKeys.length);
-      if (hits > 0) scored.push({ sentence, score, citation: i + 1 });
+      const matched = new Set<string>();
+      for (const k of sKeys) if (qKeys.has(k)) matched.add(k);
+      if (matched.size === 0) continue;
+      const score = matched.size / Math.sqrt(sKeys.length);
+      scored.push({ sentence, score, citation: i + 1, distinct: matched.size });
     }
   });
 
   scored.sort((a, b) => b.score - a.score);
   const top = scored.slice(0, 4).filter((s) => s.score > 0);
 
-  if (top.length === 0) {
+  // Refusal gate: require enough *distinct* query terms to co-occur in a single
+  // sentence. Otherwise a lone common word ("annual") produces a confidently
+  // wrong extract. Questions with >=2 content words must match >=2; single-word
+  // questions must match their one word. (OpenAI mode refuses via the prompt.)
+  const requiredDistinct = Math.min(2, qKeys.size);
+  const bestDistinct = scored.reduce((m, s) => Math.max(m, s.distinct), 0);
+  if (top.length === 0 || bestDistinct < requiredDistinct) {
     return (
       "I couldn't find that in the provided documents. Try rephrasing with " +
       'terms that appear in the source text (for example exact figures, ' +
