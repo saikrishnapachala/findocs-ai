@@ -8,6 +8,8 @@ import { validatePdfBytes } from '@/lib/ingest/pdf';
 import { ingestDocument } from '@/lib/ingest/service';
 import { AppError } from '@/lib/errors';
 import { createLogger } from '@/lib/logger';
+import { rateLimit, clientIp } from '@/lib/rateLimit';
+import { maybeSweep } from '@/lib/maintenance';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -38,6 +40,20 @@ export async function POST(req: NextRequest) {
   const log = createLogger();
   try {
     const cfg = getConfig();
+    const rl = rateLimit(
+      `upload:${clientIp(req)}`,
+      cfg.rateLimitUploadPerHour,
+      60 * 60 * 1000,
+    );
+    if (!rl.allowed) {
+      throw new AppError(
+        'rate_limited',
+        `Upload limit reached. Please wait ${rl.retryAfterSec}s.`,
+        429,
+      );
+    }
+    void maybeSweep();
+
     const form = await req.formData();
     const file = form.get('file');
     if (!(file instanceof File)) {

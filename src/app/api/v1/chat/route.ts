@@ -7,6 +7,9 @@ import { streamAnswer } from '@/lib/chat/stream';
 import { encodeSSE } from '@/lib/chat/events';
 import { AppError } from '@/lib/errors';
 import { createLogger } from '@/lib/logger';
+import { getConfig } from '@/lib/config';
+import { rateLimit, clientIp } from '@/lib/rateLimit';
+import { maybeSweep } from '@/lib/maintenance';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -23,6 +26,21 @@ const bodySchema = z.object({
 export async function POST(req: NextRequest) {
   const sessionId = ensureSessionId(req);
   const log = createLogger();
+
+  const cfg = getConfig();
+  const rl = rateLimit(`chat:${clientIp(req)}`, cfg.rateLimitChatPerMin, 60_000);
+  if (!rl.allowed) {
+    return jsonError(
+      new AppError(
+        'rate_limited',
+        `Too many requests. Please wait ${rl.retryAfterSec}s and try again.`,
+        429,
+      ),
+      log.requestId,
+      sessionId,
+    );
+  }
+  void maybeSweep();
 
   let question: string;
   let documentIds: string[] | undefined;
