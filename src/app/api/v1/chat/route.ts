@@ -13,6 +13,8 @@ import { maybeSweep } from '@/lib/maintenance';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+// Allow long streamed generations on Vercel (default is short).
+export const maxDuration = 60;
 
 const bodySchema = z.object({
   question: z.string().trim().min(1, 'Question is required.').max(2000),
