@@ -39,3 +39,6 @@ yarn-error.log*
 
 # runtime data (uploaded docs live in memory; nothing persisted by default)
 /.data
+
+# TypeScript incremental build info
+*.tsbuildinfo
